@@ -19,7 +19,7 @@ class UndanganAbsen extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public $karyawan;
-    public $qrcodeBase64;
+    public $qrcodePath;
 
     /**
      * Create a new message instance.
@@ -28,12 +28,12 @@ class UndanganAbsen extends Mailable implements ShouldQueue
     {
         $this->karyawan = $karyawan;
         
-        // Generate QR Code saat construct agar tersedia untuk view
+        // Generate QR Code dan simpan ke temporary file
         $this->generateQRCode();
     }
 
     /**
-     * Generate QR Code dan convert ke base64
+     * Generate QR Code dan simpan ke file
      */
     private function generateQRCode()
     {
@@ -46,8 +46,15 @@ class UndanganAbsen extends Mailable implements ShouldQueue
             ->margin(10)
             ->build();
         
-        // Convert to base64 untuk embed di email
-        $this->qrcodeBase64 = base64_encode($result->getString());
+        // Save ke temporary file
+        $tempPath = storage_path('app/temp');
+        if (!file_exists($tempPath)) {
+            mkdir($tempPath, 0755, true);
+        }
+        
+        $filename = 'qrcode_' . $this->karyawan->nik . '_' . time() . '.png';
+        $this->qrcodePath = $tempPath . '/' . $filename;
+        $result->saveToFile($this->qrcodePath);
     }
 
     /**
@@ -70,7 +77,7 @@ class UndanganAbsen extends Mailable implements ShouldQueue
             view: 'emails.undangan_absen',
             with: [
                 'karyawan' => $this->karyawan,
-                'qrcodeBase64' => $this->qrcodeBase64,
+                'qrcodePath' => $this->qrcodePath,
                 'tanggalSeminar' => '5 November 2025',
                 'waktuSeminar' => '09:00 - 17:00 WIB',
                 'tempatSeminar' => 'Hotel Primebiz, Cikarang',

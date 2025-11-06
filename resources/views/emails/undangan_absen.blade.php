@@ -146,8 +146,8 @@
             <h3>QR CODE ABSENSI ANDA</h3>
             <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Screenshot atau simpan QR Code di bawah ini:</p>
             <div class="qrcode-image" style="background: white; padding: 20px; border-radius: 8px; display: inline-block; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                <!-- QR Code embedded langsung di body email -->
-                <img src="data:image/png;base64,{{ $qrcodeBase64 }}" 
+                <!-- QR Code embedded menggunakan CID (Content-ID) -->
+                <img src="{{ $message->embed($qrcodePath) }}" 
                      alt="QR Code Absensi {{ $karyawan->nik }}" 
                      style="max-width: 300px; height: auto; display: block; margin: 0 auto; border: 3px solid #ff6b35; border-radius: 8px;" />
             </div>
