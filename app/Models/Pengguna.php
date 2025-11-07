@@ -11,6 +11,8 @@ class Pengguna extends Authenticatable
 
     protected $table = 'pengguna';
 
+    protected $connection = 'simmwt';
+
     protected $fillable = [
         'id_departemen',
         'username',
@@ -39,4 +41,3 @@ class Pengguna extends Authenticatable
         return $this->belongsTo(Departemen::class, 'id_departemen');
     }
 }
-

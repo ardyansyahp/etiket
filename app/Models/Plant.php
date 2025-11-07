@@ -26,4 +26,3 @@ class Plant extends Model
         return $this->hasMany(Karyawan::class, 'id_plant');
     }
 }
-

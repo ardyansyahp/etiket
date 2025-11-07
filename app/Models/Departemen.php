@@ -27,4 +27,3 @@ class Departemen extends Model
         return $this->hasMany(Pengguna::class, 'id_departemen');
     }
 }
-

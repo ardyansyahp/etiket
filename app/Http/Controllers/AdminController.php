@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\UndanganAbsen;
 use App\Models\Absen;
 use App\Models\Departemen;
 use App\Models\Karyawan;
 use App\Models\Pengguna;
 use App\Models\Plant;
-use App\Mail\UndanganAbsen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AdminController extends Controller
 {
-
     public function showLogin()
     {
         if (Auth::guard('pengguna')->check()) {
@@ -37,12 +36,12 @@ class AdminController extends Controller
 
         if ($pengguna && Hash::check($request->password, $pengguna->password)) {
             Auth::guard('pengguna')->login($pengguna);
-            
+
             // Handle remember me
             if ($request->remember) {
                 Auth::guard('pengguna')->login($pengguna, true);
             }
-            
+
             // Check if AJAX request
             if ($request->ajax()) {
                 return response()->json([
@@ -50,7 +49,7 @@ class AdminController extends Controller
                     'redirect' => route('admin.dashboard')
                 ]);
             }
-            
+
             return redirect()->route('admin.dashboard');
         }
 
@@ -233,26 +232,27 @@ class AdminController extends Controller
     public function karyawan(Request $request)
     {
         $query = Karyawan::with('departemen', 'plant');
-        
+
         // Handle search
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nama_lengkap', 'like', '%' . $search . '%')
-                  ->orWhere('nik', 'like', '%' . $search . '%')
-                  ->orWhere('jabatan', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%')
-                  ->orWhere('no_telp', 'like', '%' . $search . '%')
-                  ->orWhere('alamat', 'like', '%' . $search . '%')
-                  ->orWhereHas('departemen', function($q) use ($search) {
-                      $q->where('nama', 'like', '%' . $search . '%');
-                  })
-                  ->orWhereHas('plant', function($q) use ($search) {
-                      $q->where('nama', 'like', '%' . $search . '%');
-                  });
+            $query->where(function ($q) use ($search) {
+                $q
+                    ->where('nama_lengkap', 'like', '%' . $search . '%')
+                    ->orWhere('nik', 'like', '%' . $search . '%')
+                    ->orWhere('jabatan', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('no_telp', 'like', '%' . $search . '%')
+                    ->orWhere('alamat', 'like', '%' . $search . '%')
+                    ->orWhereHas('departemen', function ($q) use ($search) {
+                        $q->where('nama', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('plant', function ($q) use ($search) {
+                        $q->where('nama', 'like', '%' . $search . '%');
+                    });
             });
         }
-        
+
         $karyawan = $query->paginate(10)->withQueryString();
         return view('admin.karyawan.index', compact('karyawan'));
     }
@@ -341,29 +341,29 @@ class AdminController extends Controller
             ]);
 
             $file = $request->file('excel_file');
-            
+
             if (!$file) {
                 return redirect()->route('admin.karyawan')->with('error', 'File tidak ditemukan! Pastikan file sudah dipilih.');
             }
-            
+
             // Deteksi extension dari nama file dan MIME type
             $extension = strtolower($file->getClientOriginalExtension());
             $mimeType = $file->getMimeType();
-            
+
             // Jika extension tidak ada, coba deteksi dari MIME type
             if (empty($extension)) {
                 $mimeToExtension = [
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
                     'application/vnd.ms-excel' => 'xls',
                     'text/csv' => 'csv',
-                    'text/plain' => 'csv', // CSV sering terdeteksi sebagai text/plain
+                    'text/plain' => 'csv',  // CSV sering terdeteksi sebagai text/plain
                     'application/csv' => 'csv',
                 ];
                 if (isset($mimeToExtension[$mimeType])) {
                     $extension = $mimeToExtension[$mimeType];
                 }
             }
-            
+
             // Validasi extension
             if (!in_array($extension, ['xlsx', 'xls', 'csv'])) {
                 $errorMsg = 'Format file tidak didukung! ';
@@ -372,32 +372,32 @@ class AdminController extends Controller
                 $errorMsg .= 'Gunakan format .xlsx, .xls, atau .csv';
                 return redirect()->route('admin.karyawan')->with('error', $errorMsg);
             }
-            
+
             if ($extension == 'csv') {
                 // Baca file CSV dengan handling encoding dan BOM
                 $filePath = $file->getRealPath();
                 $content = file_get_contents($filePath);
-                
+
                 // Remove BOM UTF-8 jika ada
-                if (substr($content, 0, 3) == chr(0xEF).chr(0xBB).chr(0xBF)) {
+                if (substr($content, 0, 3) == chr(0xEF) . chr(0xBB) . chr(0xBF)) {
                     $content = substr($content, 3);
                 }
-                
+
                 // Coba detect encoding
                 $encoding = mb_detect_encoding($content, ['UTF-8', 'Windows-1252', 'ISO-8859-1'], true);
                 if ($encoding && $encoding != 'UTF-8') {
                     $content = mb_convert_encoding($content, 'UTF-8', $encoding);
                 }
-                
+
                 // Simpan ke temporary file
                 $tempFile = tempnam(sys_get_temp_dir(), 'csv_import_');
                 file_put_contents($tempFile, $content);
-                
+
                 // Baca CSV dengan berbagai delimiter
                 $data = [];
                 $delimiters = [',', ';', "\t"];
                 $delimiter = ',';
-                
+
                 foreach ($delimiters as $del) {
                     $handle = fopen($tempFile, 'r');
                     if ($handle !== false) {
@@ -409,16 +409,16 @@ class AdminController extends Controller
                         }
                     }
                 }
-                
+
                 // Baca semua baris dengan delimiter yang tepat
                 $handle = fopen($tempFile, 'r');
                 if ($handle !== false) {
                     while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
                         // Clean up setiap cell (remove BOM dan whitespace)
-                        $row = array_map(function($cell) {
+                        $row = array_map(function ($cell) {
                             $cell = trim($cell);
                             // Remove BOM dari cell jika ada
-                            if (substr($cell, 0, 3) == chr(0xEF).chr(0xBB).chr(0xBF)) {
+                            if (substr($cell, 0, 3) == chr(0xEF) . chr(0xBB) . chr(0xBF)) {
                                 $cell = substr($cell, 3);
                             }
                             return $cell;
@@ -428,17 +428,17 @@ class AdminController extends Controller
                     fclose($handle);
                 }
                 unlink($tempFile);
-                
+
                 // Ambil header
                 if (empty($data)) {
                     return redirect()->route('admin.karyawan')->with('error', 'File CSV kosong atau tidak dapat dibaca!');
                 }
-                
+
                 $header = array_shift($data);
                 // Clean header dari BOM
-                $header = array_map(function($h) {
+                $header = array_map(function ($h) {
                     $h = trim($h);
-                    if (substr($h, 0, 3) == chr(0xEF).chr(0xBB).chr(0xBF)) {
+                    if (substr($h, 0, 3) == chr(0xEF) . chr(0xBB) . chr(0xBF)) {
                         $h = substr($h, 3);
                     }
                     return $h;
@@ -452,34 +452,36 @@ class AdminController extends Controller
                         $spreadsheet = $reader->load($file->getRealPath());
                         $worksheet = $spreadsheet->getActiveSheet();
                         $rows = $worksheet->toArray();
-                        
+
                         // Filter baris kosong dan ambil header
                         if (empty($rows)) {
                             return redirect()->route('admin.karyawan')->with('error', 'File Excel kosong atau tidak dapat dibaca!');
                         }
-                        
+
                         $header = array_shift($rows);
-                        
+
                         // Clean header - hapus null/empty dan trim
-                        $header = array_map(function($h) {
-                            if ($h === null) return '';
-                            $h = trim((string)$h);
+                        $header = array_map(function ($h) {
+                            if ($h === null)
+                                return '';
+                            $h = trim((string) $h);
                             // Remove BOM jika ada
-                            if (substr($h, 0, 3) == chr(0xEF).chr(0xBB).chr(0xBF)) {
+                            if (substr($h, 0, 3) == chr(0xEF) . chr(0xBB) . chr(0xBF)) {
                                 $h = substr($h, 3);
                             }
                             return $h;
                         }, $header);
-                        
+
                         // Filter data - hanya ambil baris yang tidak kosong
                         $data = [];
                         foreach ($rows as $row) {
                             // Clean row - hapus null dan trim
-                            $cleanRow = array_map(function($cell) {
-                                if ($cell === null) return '';
-                                return trim((string)$cell);
+                            $cleanRow = array_map(function ($cell) {
+                                if ($cell === null)
+                                    return '';
+                                return trim((string) $cell);
                             }, $row);
-                            
+
                             // Skip jika semua cell kosong
                             if (!empty(array_filter($cleanRow))) {
                                 $data[] = $cleanRow;
@@ -535,18 +537,19 @@ class AdminController extends Controller
 
             $imported = 0;
             $errors = [];
-            
+
             // Tambahkan warning jika ada header yang tidak dikenali
             if (!empty($unmappedHeaders)) {
-                $errors[] = "Warning: Kolom tidak dikenali: " . implode(', ', $unmappedHeaders);
+                $errors[] = 'Warning: Kolom tidak dikenali: ' . implode(', ', $unmappedHeaders);
             }
 
             foreach ($data as $rowIndex => $row) {
-                if (empty(array_filter($row))) continue; // Skip empty rows
+                if (empty(array_filter($row)))
+                    continue;  // Skip empty rows
 
                 try {
                     $karyawanData = [];
-                    
+
                     foreach ($normalizedHeader as $excelIdx => $dbField) {
                         if (isset($row[$excelIdx])) {
                             $karyawanData[$dbField] = trim($row[$excelIdx]);
@@ -572,7 +575,7 @@ class AdminController extends Controller
 
                     // Validasi required fields
                     if (empty($karyawanData['nama_lengkap']) || empty($karyawanData['nik'])) {
-                        $errors[] = "Baris " . ($rowIndex + 2) . ": Nama Lengkap dan NIK wajib diisi";
+                        $errors[] = 'Baris ' . ($rowIndex + 2) . ': Nama Lengkap dan NIK wajib diisi';
                         continue;
                     }
 
@@ -602,7 +605,7 @@ class AdminController extends Controller
                     Karyawan::create($karyawanData);
                     $imported++;
                 } catch (\Exception $e) {
-                    $errors[] = "Baris " . ($rowIndex + 2) . ": " . $e->getMessage();
+                    $errors[] = 'Baris ' . ($rowIndex + 2) . ': ' . $e->getMessage();
                 }
             }
 
@@ -610,7 +613,7 @@ class AdminController extends Controller
             if ($imported > 0) {
                 $message = "✅ Berhasil mengimpor {$imported} karyawan!";
                 if (!empty($errors)) {
-                    $message .= " Terdapat " . count($errors) . " error/warning: " . implode(', ', array_slice($errors, 0, 3));
+                    $message .= ' Terdapat ' . count($errors) . ' error/warning: ' . implode(', ', array_slice($errors, 0, 3));
                 }
 
                 // Log success
@@ -627,7 +630,7 @@ class AdminController extends Controller
                 $headerInfo = !empty($header) ? implode(', ', array_filter($header)) : 'Tidak ada header';
                 $dataInfo = !empty($data) ? count($data) . ' baris data' : 'Tidak ada data';
                 $errorMsg = 'Tidak ada data yang diimpor! Header yang dibaca: ' . $headerInfo . '. Data yang ditemukan: ' . $dataInfo . '. Pastikan file berisi data valid setelah header.';
-                
+
                 // Log untuk debugging
                 Log::warning('Import Karyawan: No data imported', [
                     'headers' => $header,
@@ -635,14 +638,14 @@ class AdminController extends Controller
                     'normalized_headers' => isset($normalizedHeader) ? $normalizedHeader : [],
                     'data_preview' => !empty($data) ? array_slice($data, 0, 2) : []
                 ]);
-                
+
                 return redirect()->route('admin.karyawan')->with('error', $errorMsg);
             }
 
             // Jika ada error dan tidak ada yang diimport
             $errorMsg = 'Gagal mengimpor data! ';
-            $errorMsg .= count($errors) . " error: " . implode(', ', array_slice($errors, 0, 5));
-            
+            $errorMsg .= count($errors) . ' error: ' . implode(', ', array_slice($errors, 0, 5));
+
             return redirect()->route('admin.karyawan')->with('error', $errorMsg);
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Handle validation errors
@@ -659,7 +662,7 @@ class AdminController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return redirect()->route('admin.karyawan')->with('error', 'Error mengimpor file: ' . $e->getMessage() . '. Pastikan format file sesuai template. File harus berisi header dan data.');
         }
     }
@@ -684,20 +687,20 @@ class AdminController extends Controller
         ];
 
         $filename = 'template_karyawan_' . date('YmdHis') . '.csv';
-        
+
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Content-Transfer-Encoding: binary');
         header('Pragma: no-cache');
         header('Expires: 0');
-        
+
         $output = fopen('php://output', 'w');
-        
+
         // Add BOM for UTF-8
-        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
-        
+        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
         fputcsv($output, $headers);
-        
+
         // Contoh data
         fputcsv($output, [
             'John Doe',
@@ -714,7 +717,7 @@ class AdminController extends Controller
             'Information Technology',
             'Plant Jakarta'
         ]);
-        
+
         fclose($output);
         exit;
     }
@@ -749,7 +752,7 @@ class AdminController extends Controller
         if ($failed > 0) {
             $message .= " Gagal mengirim ke {$failed} karyawan.";
             if (!empty($errors)) {
-                $message .= " Error: " . implode(', ', array_slice($errors, 0, 3));
+                $message .= ' Error: ' . implode(', ', array_slice($errors, 0, 3));
             }
         }
 
@@ -903,4 +906,3 @@ class AdminController extends Controller
         return redirect()->route('admin.absen')->with('success', "Berhasil menghapus semua data absen ({$count} record)!");
     }
 }
-

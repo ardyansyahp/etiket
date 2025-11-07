@@ -47,4 +47,3 @@ class Karyawan extends Model
         return $this->hasMany(Absen::class, 'id_karyawan');
     }
 }
-
