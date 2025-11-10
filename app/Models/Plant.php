@@ -21,8 +21,4 @@ class Plant extends Model
         'alamat',
     ];
 
-    public function karyawan()
-    {
-        return $this->hasMany(Karyawan::class, 'id_plant');
-    }
 }

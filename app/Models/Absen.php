@@ -12,7 +12,7 @@ class Absen extends Model
     protected $table = 'absen';
 
     protected $fillable = [
-        'id_karyawan',
+        'id_peserta',
         'tanggal_masuk',
         'nomor_tiket',
     ];
@@ -21,9 +21,9 @@ class Absen extends Model
         'tanggal_masuk' => 'datetime',
     ];
 
-    public function karyawan()
+    public function peserta()
     {
-        return $this->belongsTo(Karyawan::class, 'id_karyawan');
+        return $this->belongsTo(Peserta::class, 'id_peserta');
     }
 }
 

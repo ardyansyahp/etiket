@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'device_key' => env('WA_DEVICE_KEY'),
+        'api_key' => env('WA_API_KEY'),
+        'api_url' => env('WA_API_URL'),
+        'tiket_group_id' => env('WA_TIKET_GROUP_ID'),
+    ],
+
 ];

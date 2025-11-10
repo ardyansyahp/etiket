@@ -13,10 +13,10 @@
         <div class="container">
             <a href="{{ route('admin.absen') }}" class="navbar-brand">Kelola Absen</a>
             <ul class="navbar-nav">
-                <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ route('admin.absen') }}">Absen</a></li>
                 <li><a href="{{ route('admin.departemen') }}">Departemen</a></li>
                 <li><a href="{{ route('admin.plant') }}">Plant</a></li>
-                <li><a href="{{ route('admin.karyawan') }}">Karyawan</a></li>
+                <li><a href="{{ route('admin.peserta') }}">Peserta</a></li>
                 <li><a href="{{ route('admin.pengguna') }}">Pengguna</a></li>
                 <li>
                     <form action="{{ route('admin.logout') }}" method="POST" style="display: inline;">
@@ -60,11 +60,10 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Nama Karyawan</th>
-                                <th>NIK</th>
-                                <th>Jabatan</th>
-                                <th>Departemen</th>
-                                <th>Plant</th>
+                                <th>Nama Peserta</th>
+                                <th>No. Peserta</th>
+                                <th>Email</th>
+                                <th>No. HP</th>
                                 <th>Tanggal Masuk</th>
                                 <th>Nomor Tiket</th>
                                 <th>Aksi</th>
@@ -74,11 +73,10 @@
                             @forelse($absen as $item)
                                 <tr>
                                     <td>{{ $item->id }}</td>
-                                    <td>{{ $item->karyawan->nama_lengkap ?? '-' }}</td>
-                                    <td>{{ $item->karyawan->nik ?? '-' }}</td>
-                                    <td>{{ $item->karyawan->jabatan ?? '-' }}</td>
-                                    <td>{{ $item->karyawan->departemen->nama ?? '-' }}</td>
-                                    <td>{{ $item->karyawan->plant->nama ?? '-' }}</td>
+                                    <td>{{ $item->peserta->nama_lengkap ?? '-' }}</td>
+                                    <td>{{ $item->peserta->no_peserta ?? '-' }}</td>
+                                    <td>{{ $item->peserta->email ?? '-' }}</td>
+                                    <td>{{ $item->peserta->no_hp ?? '-' }}</td>
                                     <td>{{ $item->tanggal_masuk ? $item->tanggal_masuk->format('d/m/Y H:i:s') : '-' }}</td>
                                     <td>{{ $item->nomor_tiket ?? '-' }}</td>
                                     <td>
@@ -94,7 +92,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" style="text-align: center; padding: 20px; color: #6b7280;">Tidak ada data</td>
+                                    <td colspan="8" style="text-align: center; padding: 20px; color: #6b7280;">Tidak ada data</td>
                                 </tr>
                             @endforelse
                         </tbody>

@@ -15,8 +15,6 @@ Route::prefix('admin')->group(function () {
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
     Route::middleware('auth:pengguna')->group(function () {
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-
         // Departemen
         Route::get('/departemen', [AdminController::class, 'departemen'])->name('admin.departemen');
         Route::get('/departemen/create', [AdminController::class, 'departemenCreate'])->name('admin.departemen.create');
@@ -33,18 +31,20 @@ Route::prefix('admin')->group(function () {
         Route::post('/plant/{id}/update', [AdminController::class, 'plantUpdate'])->name('admin.plant.update');
         Route::post('/plant/{id}/delete', [AdminController::class, 'plantDelete'])->name('admin.plant.delete');
 
-        // Karyawan
-        Route::get('/karyawan', [AdminController::class, 'karyawan'])->name('admin.karyawan');
-        Route::get('/karyawan/create', [AdminController::class, 'karyawanCreate'])->name('admin.karyawan.create');
-        Route::post('/karyawan/store', [AdminController::class, 'karyawanStore'])->name('admin.karyawan.store');
-        Route::get('/karyawan/{id}/detail', [AdminController::class, 'karyawanDetail'])->name('admin.karyawan.detail');
-        Route::get('/karyawan/{id}/edit', [AdminController::class, 'karyawanEdit'])->name('admin.karyawan.edit');
-        Route::post('/karyawan/{id}/update', [AdminController::class, 'karyawanUpdate'])->name('admin.karyawan.update');
-        Route::post('/karyawan/{id}/delete', [AdminController::class, 'karyawanDelete'])->name('admin.karyawan.delete');
-        Route::post('/karyawan/import', [AdminController::class, 'karyawanImport'])->name('admin.karyawan.import');
-        Route::get('/karyawan/template', [AdminController::class, 'karyawanTemplate'])->name('admin.karyawan.template');
-        Route::post('/karyawan/kirim-undangan', [AdminController::class, 'karyawanKirimUndangan'])->name('admin.karyawan.kirimUndangan');
-        Route::post('/karyawan/{id}/kirim-undangan', [AdminController::class, 'karyawanKirimUndanganSatu'])->name('admin.karyawan.kirimUndanganSatu');
+        // Peserta
+        Route::get('/peserta', [AdminController::class, 'peserta'])->name('admin.peserta');
+        Route::get('/peserta/create', [AdminController::class, 'pesertaCreate'])->name('admin.peserta.create');
+        Route::post('/peserta/store', [AdminController::class, 'pesertaStore'])->name('admin.peserta.store');
+        Route::get('/peserta/{id}/detail', [AdminController::class, 'pesertaDetail'])->name('admin.peserta.detail');
+        Route::get('/peserta/{id}/edit', [AdminController::class, 'pesertaEdit'])->name('admin.peserta.edit');
+        Route::post('/peserta/{id}/update', [AdminController::class, 'pesertaUpdate'])->name('admin.peserta.update');
+        Route::post('/peserta/{id}/delete', [AdminController::class, 'pesertaDelete'])->name('admin.peserta.delete');
+        Route::post('/peserta/import', [AdminController::class, 'pesertaImport'])->name('admin.peserta.import');
+        Route::get('/peserta/template', [AdminController::class, 'pesertaTemplate'])->name('admin.peserta.template');
+        Route::post('/peserta/kirim-undangan', [AdminController::class, 'pesertaKirimUndangan'])->name('admin.peserta.kirimUndangan');
+        Route::post('/peserta/{id}/kirim-undangan', [AdminController::class, 'pesertaKirimUndanganSatu'])->name('admin.peserta.kirimUndanganSatu');
+        Route::post('/peserta/kirim-whatsapp', [AdminController::class, 'pesertaKirimWhatsApp'])->name('admin.peserta.kirimWhatsApp');
+        Route::post('/peserta/{id}/kirim-whatsapp', [AdminController::class, 'pesertaKirimWhatsAppSatu'])->name('admin.peserta.kirimWhatsAppSatu');
 
         // Pengguna
         Route::get('/pengguna', [AdminController::class, 'pengguna'])->name('admin.pengguna');

@@ -186,7 +186,7 @@
         </div>
 
         <div class="greeting">
-            <p>Yth. <strong>{{ $karyawan->nama_lengkap }}</strong>,</p>
+            <p>Yth. <strong>{{ $peserta->nama_lengkap }}</strong>,</p>
         </div>
 
         <div class="content">
@@ -207,8 +207,8 @@
                 <span class="info-value">Hotel Primebiz, Cikarang</span>
             </div>
             <div class="info-row">
-                <span class="info-label">NIK Anda:</span>
-                <span class="info-value" style="font-weight: 700; color: #ff6b35; font-size: 16px; word-break: break-all;">{{ $karyawan->nik }}</span>
+                <span class="info-label">No. Peserta Anda:</span>
+                <span class="info-value" style="font-weight: 700; color: #ff6b35; font-size: 16px; word-break: break-all;">{{ $peserta->no_peserta }}</span>
             </div>
         </div>
 
@@ -218,10 +218,10 @@
             <div class="qrcode-image" style="background: white; padding: 12px; border-radius: 8px; display: inline-block; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: calc(100% - 20px);">
                 <!-- QR Code embedded menggunakan CID (Content-ID) -->
                 <img src="{{ $message->embed($qrcodePath) }}" 
-                     alt="QR Code Absensi {{ $karyawan->nik }}" 
+                     alt="QR Code Absensi {{ $peserta->no_peserta }}" 
                      style="max-width: 100%; width: 220px; height: auto; display: block; margin: 0 auto; border: 2px solid #ff6b35; border-radius: 6px;" />
             </div>
-            <p style="color: #ff6b35; font-size: 18px; font-weight: 700; margin-top: 15px; margin-bottom: 15px;">NIK: {{ $karyawan->nik }}</p>
+            <p style="color: #ff6b35; font-size: 18px; font-weight: 700; margin-top: 15px; margin-bottom: 15px;">No. Peserta: {{ $peserta->no_peserta }}</p>
             <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 12px; margin: 15px auto; max-width: 100%;">
                 <p style="margin: 0; color: #856404; font-size: 13px; line-height: 1.5;">
                     💡 <strong>Tips:</strong> Screenshot QR Code di atas dan simpan di HP Anda untuk digunakan saat absensi. 
@@ -236,7 +236,7 @@
                 <li><strong>Screenshot</strong> QR Code di atas dan simpan ke HP Anda</li>
                 <li>Tunjukkan QR Code saat tiba di lokasi seminar</li>
                 <li>Petugas akan scan QR Code Anda untuk absensi</li>
-                <li>Jika QR Code tidak bisa di-scan, input NIK <strong>{{ $karyawan->nik }}</strong> di mesin absen</li>
+                <li>Jika QR Code tidak bisa di-scan, input No. Peserta <strong>{{ $peserta->no_peserta }}</strong> di mesin absen</li>
                 <li>File QR Code juga dilampirkan sebagai attachment untuk backup</li>
             </ol>
         </div>

@@ -10,9 +10,9 @@
 <body>
     <nav class="navbar">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-            <a href="{{ route('admin.dashboard') }}" class="navbar-brand">Admin Dashboard</a>
+            <a href="{{ route('admin.absen') }}" class="navbar-brand">Admin Absen</a>
             <ul class="navbar-nav">
-                <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ route('admin.absen') }}">Absen</a></li>
                 <li><a href="{{ route('admin.departemen') }}">Departemen</a></li>
                 <li><a href="{{ route('admin.plant') }}">Plant</a></li>
                 <li><a href="{{ route('admin.karyawan') }}">Karyawan</a></li>

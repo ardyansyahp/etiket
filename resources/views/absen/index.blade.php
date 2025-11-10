@@ -10,7 +10,10 @@
     <link rel="stylesheet" href="{{ asset('css/absen.css') }}?v={{ time() }}">
 </head>
 
-<body class="absen-body">
+<body class="absen-body" 
+      data-success-absen="{{ session('success_absen') ? 'true' : 'false' }}"
+      data-already-absen="{{ session('already_absen') ? 'true' : 'false' }}"
+      data-error-no-peserta="{{ session('error_no_peserta') ? 'true' : 'false' }}">
     <div class="absen-container">
         <!-- Header -->
         <div class="absen-header">
@@ -44,18 +47,18 @@
                     <h2>ABSEN MASUK</h2>
                 </div>
 
-                @if(session('error_nik'))
-                <div class="alert-box error-nik" id="errorNikAlert" style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border: 2px solid #dc3545; border-radius: 10px; padding: 20px; margin: 10px 15px; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);">
+                @if(session('error_no_peserta'))
+                <div class="alert-box error-no-peserta" id="errorNoPesertaAlert" style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border: 2px solid #dc3545; border-radius: 10px; padding: 20px; margin: 10px 15px; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);">
                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
                         <div style="font-size: 40px;">❌</div>
                         <div style="flex: 1;">
-                            <div style="font-weight: 700; font-size: 18px; color: #721c24; margin-bottom: 5px;">NIK Tidak Ditemukan!</div>
-                            <div style="font-size: 14px; color: #721c24;">{{ session('error_message') ?? 'NIK yang Anda masukkan tidak terdaftar dalam sistem' }}</div>
+                            <div style="font-weight: 700; font-size: 18px; color: #721c24; margin-bottom: 5px;">No. Peserta Tidak Ditemukan!</div>
+                            <div style="font-size: 14px; color: #721c24;">{{ session('error_message') ?? 'No. Peserta yang Anda masukkan tidak terdaftar dalam sistem' }}</div>
                         </div>
                     </div>
                     <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px;">
                         <div style="text-align: center; color: #555; font-size: 14px;">
-                            Silakan periksa kembali NIK yang Anda masukkan atau hubungi administrator
+                            Silakan periksa kembali No. Peserta yang Anda masukkan atau hubungi administrator
                         </div>
                     </div>
                 </div>
@@ -67,7 +70,7 @@
                         <div style="font-size: 40px;">⚠️</div>
                         <div style="flex: 1;">
                             <div style="font-weight: 700; font-size: 18px; color: #856404; margin-bottom: 5px;">Anda Sudah Melakukan Absen Hari Ini!</div>
-                            <div style="font-size: 14px; color: #856404;">NIK ini sudah terdaftar untuk hari ini</div>
+                            <div style="font-size: 14px; color: #856404;">No. Peserta ini sudah terdaftar untuk hari ini</div>
                         </div>
                     </div>
                     <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px;">
@@ -76,8 +79,8 @@
                             <span style="color: #333; font-weight: 500;">{{ session('absen_data.nama') }}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                            <span style="font-weight: 600; color: #555;">Jabatan:</span>
-                            <span style="color: #333; font-weight: 500;">{{ session('absen_data.jabatan') }}</span>
+                            <span style="font-weight: 600; color: #555;">Email:</span>
+                            <span style="color: #333; font-weight: 500;">{{ session('absen_data.email') }}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
                             <span style="font-weight: 600; color: #555;">Jam Masuk:</span>
@@ -106,8 +109,8 @@
                             <span style="color: #333; font-weight: 500;">{{ session('absen_data.nama') }}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                            <span style="font-weight: 600; color: #555;">Jabatan:</span>
-                            <span style="color: #333; font-weight: 500;">{{ session('absen_data.jabatan') }}</span>
+                            <span style="font-weight: 600; color: #555;">Email:</span>
+                            <span style="color: #333; font-weight: 500;">{{ session('absen_data.email') }}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
                             <span style="font-weight: 600; color: #555;">Jam Masuk:</span>
@@ -121,7 +124,7 @@
                 </div>
                 @endif
 
-                <div class="absen-content" @if(session('already_absen') || session('success_absen') || session('error_nik')) style="display: none;" @endif>
+                <div class="absen-content" @if(session('already_absen') || session('success_absen') || session('error_no_peserta')) style="display: none;" @endif>
                     <!-- Barcode Image -->
                     <div class="barcode-container">
                         <div class="barcode-placeholder">
@@ -188,11 +191,11 @@
                         <div class="form-group-absen">
                             <input
                                 type="text"
-                                id="nik"
-                                name="nik"
+                                id="no_peserta"
+                                name="no_peserta"
                                 class="absen-input-custom @if(session('already_absen') || session('success_absen')) disabled-input @endif"
-                                placeholder="@if(session('already_absen')) NIK sudah terdaftar hari ini @elseif(session('success_absen')) Absen berhasil dicatat @else INPUT NIK DISINI .... @endif"
-                                value="{{ session('absen_data.nik') ?? '' }}"
+                                placeholder="@if(session('already_absen')) No. Peserta sudah terdaftar hari ini @elseif(session('success_absen')) Absen berhasil dicatat @else INPUT NO. PESERTA DISINI .... @endif"
+                                value="{{ session('absen_data.no_peserta') ?? '' }}"
                                 required
                                 @if(session('already_absen') || session('success_absen')) disabled @else autofocus @endif
                                 autocomplete="off">
@@ -225,8 +228,8 @@
                 <div class="absen-item">
                     <div class="absen-item-icon">👤</div>
                     <div class="absen-item-content">
-                        <div class="absen-item-name">{{ $absen->karyawan->nama_lengkap }}</div>
-                        <div class="absen-item-role">{{ $absen->karyawan->jabatan ?? 'Pegawai' }}</div>
+                        <div class="absen-item-name">{{ $absen->peserta->nama_lengkap }}</div>
+                        <div class="absen-item-role">{{ $absen->peserta->email ?? '-' }}</div>
                         <div class="absen-item-time">masuk : {{ $absen->tanggal_masuk->format('H:i:s') }}</div>
                     </div>
                 </div>
@@ -255,83 +258,91 @@
 
     <script src="{{ asset('js/absen.js') }}"></script>
     <script>
-        // Play sound berdasarkan kondisi
-        @if(session('success_absen'))
-        (function() {
-            const soundSukses = document.getElementById('soundSukses');
-            if (soundSukses) {
-                soundSukses.play().catch(function(error) {
-                    console.log('Error playing success sound:', error);
-                });
-            }
-        })();
-        @endif
+        // Set variabel dari Blade ke JavaScript via data attributes
+        const bodyElement = document.body;
+        const sessionData = {
+            success_absen: bodyElement.getAttribute('data-success-absen') === 'true',
+            already_absen: bodyElement.getAttribute('data-already-absen') === 'true',
+            error_no_peserta: bodyElement.getAttribute('data-error-no-peserta') === 'true'
+        };
 
-        @if(session('already_absen') || session('error_nik'))
-        (function() {
-            const soundFailed = document.getElementById('soundFailed');
-            if (soundFailed) {
-                soundFailed.play().catch(function(error) {
-                    console.log('Error playing failed sound:', error);
-                });
-            }
-        })();
-        @endif
+        // Play sound berdasarkan kondisi
+        if (sessionData.success_absen) {
+            (function() {
+                const soundSukses = document.getElementById('soundSukses');
+                if (soundSukses) {
+                    soundSukses.play().catch(function(error) {
+                        console.log('Error playing success sound:', error);
+                    });
+                }
+            })();
+        }
+
+        if (sessionData.already_absen || sessionData.error_no_peserta) {
+            (function() {
+                const soundFailed = document.getElementById('soundFailed');
+                if (soundFailed) {
+                    soundFailed.play().catch(function(error) {
+                        console.log('Error playing failed sound:', error);
+                    });
+                }
+            })();
+        }
 
         // Auto-hide alert dan reset form setelah 5 detik
-        @if(session('already_absen') || session('success_absen') || session('error_nik'))
-        (function() {
-            let alertId;
-            @if(session('already_absen'))
-                alertId = 'alreadyAbsenAlert';
-            @elseif(session('success_absen'))
-                alertId = 'successAbsenAlert';
-            @elseif(session('error_nik'))
-                alertId = 'errorNikAlert';
-            @endif
-            
-            const alertElement = document.getElementById(alertId);
-            const nikInput = document.getElementById('nik');
-            const scanButton = document.querySelector('.btn-scan');
-            const absenContent = document.querySelector('.absen-content');
-            let countdown = 5;
-            
-            if (alertElement) {
-                // Update countdown setiap detik
-                const countdownInterval = setInterval(function() {
-                    countdown--;
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
-                        
-                        // Hide alert dengan animasi
-                        alertElement.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
-                        alertElement.style.opacity = '0';
-                        alertElement.style.transform = 'translateY(-20px)';
-                        
-                        setTimeout(function() {
-                            alertElement.style.display = 'none';
+        if (sessionData.already_absen || sessionData.success_absen || sessionData.error_no_peserta) {
+            (function() {
+                let alertId;
+                if (sessionData.already_absen) {
+                    alertId = 'alreadyAbsenAlert';
+                } else if (sessionData.success_absen) {
+                    alertId = 'successAbsenAlert';
+                } else if (sessionData.error_no_peserta) {
+                    alertId = 'errorNoPesertaAlert';
+                }
+                
+                const alertElement = document.getElementById(alertId);
+                const noPesertaInput = document.getElementById('no_peserta');
+                const scanButton = document.querySelector('.btn-scan');
+                const absenContent = document.querySelector('.absen-content');
+                let countdown = 5;
+                
+                if (alertElement) {
+                    // Update countdown setiap detik
+                    const countdownInterval = setInterval(function() {
+                        countdown--;
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
                             
-                            // Tampilkan kembali barcode container
-                            if (absenContent) {
-                                absenContent.style.display = 'flex';
-                            }
+                            // Hide alert dengan animasi
+                            alertElement.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                            alertElement.style.opacity = '0';
+                            alertElement.style.transform = 'translateY(-20px)';
                             
-                            // Reset form
-                            nikInput.value = '';
-                            nikInput.disabled = false;
-                            nikInput.classList.remove('disabled-input');
-                            nikInput.placeholder = 'INPUT NIK DISINI ....';
-                            nikInput.focus();
-                            
-                            // Enable button
-                            scanButton.disabled = false;
-                            scanButton.classList.remove('disabled-btn');
-                        }, 500);
-                    }
-                }, 1000);
-            }
-        })();
-        @endif
+                            setTimeout(function() {
+                                alertElement.style.display = 'none';
+                                
+                                // Tampilkan kembali barcode container
+                                if (absenContent) {
+                                    absenContent.style.display = 'flex';
+                                }
+                                
+                                // Reset form
+                                noPesertaInput.value = '';
+                                noPesertaInput.disabled = false;
+                                noPesertaInput.classList.remove('disabled-input');
+                                noPesertaInput.placeholder = 'INPUT NO. PESERTA DISINI ....';
+                                noPesertaInput.focus();
+                                
+                                // Enable button
+                                scanButton.disabled = false;
+                                scanButton.classList.remove('disabled-btn');
+                            }, 500);
+                        }
+                    }, 1000);
+                }
+            })();
+        }
     </script>
 </body>
 

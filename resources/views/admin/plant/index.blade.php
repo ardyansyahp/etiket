@@ -13,11 +13,10 @@
         <div class="container">
             <a href="{{ route('admin.plant') }}" class="navbar-brand">Kelola Plant</a>
             <ul class="navbar-nav">
-                <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                <li><a href="{{ route('admin.departemen') }}">Departemen</a></li>
-                <li><a href="{{ route('admin.karyawan') }}">Karyawan</a></li>
-                <li><a href="{{ route('admin.pengguna') }}">Pengguna</a></li>
                 <li><a href="{{ route('admin.absen') }}">Absen</a></li>
+                <li><a href="{{ route('admin.departemen') }}">Departemen</a></li>
+                <li><a href="{{ route('admin.peserta') }}">Peserta</a></li>
+                <li><a href="{{ route('admin.pengguna') }}">Pengguna</a></li>
                 <li>
                     <form action="{{ route('admin.logout') }}" method="POST" style="display: inline;">
                         @csrf

@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\Karyawan;
+use App\Models\Peserta;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -18,15 +18,15 @@ class UndanganAbsen extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $karyawan;
+    public $peserta;
     public $qrcodePath;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Karyawan $karyawan)
+    public function __construct(Peserta $peserta)
     {
-        $this->karyawan = $karyawan;
+        $this->peserta = $peserta;
         
         // Generate QR Code dan simpan ke temporary file
         $this->generateQRCode();
@@ -39,7 +39,7 @@ class UndanganAbsen extends Mailable implements ShouldQueue
     {
         $result = Builder::create()
             ->writer(new PngWriter())
-            ->data($this->karyawan->nik)
+            ->data($this->peserta->no_peserta)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(ErrorCorrectionLevel::High)
             ->size(300)
@@ -52,7 +52,7 @@ class UndanganAbsen extends Mailable implements ShouldQueue
             mkdir($tempPath, 0755, true);
         }
         
-        $filename = 'qrcode_' . $this->karyawan->nik . '_' . time() . '.png';
+        $filename = 'qrcode_' . $this->peserta->no_peserta . '_' . time() . '.png';
         $this->qrcodePath = $tempPath . '/' . $filename;
         $result->saveToFile($this->qrcodePath);
     }
@@ -76,7 +76,7 @@ class UndanganAbsen extends Mailable implements ShouldQueue
         return new Content(
             view: 'emails.undangan_absen',
             with: [
-                'karyawan' => $this->karyawan,
+                'peserta' => $this->peserta,
                 'qrcodePath' => $this->qrcodePath,
                 'tanggalSeminar' => '5 November 2025',
                 'waktuSeminar' => '09:00 - 17:00 WIB',
@@ -96,7 +96,7 @@ class UndanganAbsen extends Mailable implements ShouldQueue
         // Tetap attach QR code sebagai file untuk backup
         $result = Builder::create()
             ->writer(new PngWriter())
-            ->data($this->karyawan->nik)
+            ->data($this->peserta->no_peserta)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(ErrorCorrectionLevel::High)
             ->size(300)
@@ -109,13 +109,13 @@ class UndanganAbsen extends Mailable implements ShouldQueue
             mkdir($tempPath, 0755, true);
         }
         
-        $filename = 'qrcode_' . $this->karyawan->nik . '.png';
+        $filename = 'qrcode_' . $this->peserta->no_peserta . '.png';
         $filepath = $tempPath . '/' . $filename;
         $result->saveToFile($filepath);
         
         return [
             \Illuminate\Mail\Mailables\Attachment::fromPath($filepath)
-                ->as('QRCode_' . $this->karyawan->nik . '.png')
+                ->as('QRCode_' . $this->peserta->no_peserta . '.png')
                 ->withMime('image/png'),
         ];
     }
