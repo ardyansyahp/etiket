@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Absen;
 use App\Models\Peserta;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AbsenController extends Controller
 {
@@ -31,7 +30,8 @@ class AbsenController extends Controller
             ->first();
 
         if (!$peserta) {
-            return redirect()->back()
+            return redirect()
+                ->back()
                 ->with('error_no_peserta', true)
                 ->with('error_message', 'No. Peserta tidak ditemukan!');
         }
@@ -44,7 +44,8 @@ class AbsenController extends Controller
             ->first();
 
         if ($todayAbsen) {
-            return redirect()->back()
+            return redirect()
+                ->back()
                 ->with('already_absen', true)
                 ->with('absen_data', [
                     'nama' => $todayAbsen->peserta->nama_lengkap,
@@ -59,13 +60,14 @@ class AbsenController extends Controller
         $newAbsen = Absen::create([
             'id_peserta' => $peserta->id,
             'tanggal_masuk' => now(),
-            'nomor_tiket' => $request->no_peserta, // Simpan No. Peserta sebagai nomor_tiket untuk referensi
+            'nomor_tiket' => $request->no_peserta,  // Simpan No. Peserta sebagai nomor_tiket untuk referensi
         ]);
 
         // Load relasi
         $newAbsen->load('peserta');
 
-        return redirect()->back()
+        return redirect()
+            ->back()
             ->with('success_absen', true)
             ->with('absen_data', [
                 'nama' => $newAbsen->peserta->nama_lengkap,
@@ -76,4 +78,3 @@ class AbsenController extends Controller
             ]);
     }
 }
-

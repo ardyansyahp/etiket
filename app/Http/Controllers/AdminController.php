@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Jobs\KirimWhatsappPeserta;
 use App\Mail\UndanganAbsen;
-use App\Mail\UndanganAbsen;
 use App\Models\Absen;
 use App\Models\Departemen;
 use App\Models\Pengguna;
@@ -14,10 +13,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AdminController extends Controller
 {

@@ -17,7 +17,6 @@ class Departemen extends Model
         'nomor',
     ];
 
-
     public function pengguna()
     {
         return $this->hasMany(Pengguna::class, 'id_departemen');

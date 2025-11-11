@@ -20,5 +20,4 @@ class Plant extends Model
         'kode',
         'alamat',
     ];
-
 }

@@ -26,4 +26,3 @@ class Absen extends Model
         return $this->belongsTo(Peserta::class, 'id_peserta');
     }
 }
-

@@ -3,16 +3,16 @@
 namespace App\Mail;
 
 use App\Models\Peserta;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
 
 class UndanganAbsen extends Mailable implements ShouldQueue
 {
@@ -27,7 +27,7 @@ class UndanganAbsen extends Mailable implements ShouldQueue
     public function __construct(Peserta $peserta)
     {
         $this->peserta = $peserta;
-        
+
         // Generate QR Code dan simpan ke temporary file
         $this->generateQRCode();
     }
@@ -45,13 +45,13 @@ class UndanganAbsen extends Mailable implements ShouldQueue
             ->size(300)
             ->margin(10)
             ->build();
-        
+
         // Save ke temporary file
         $tempPath = storage_path('app/temp');
         if (!file_exists($tempPath)) {
             mkdir($tempPath, 0755, true);
         }
-        
+
         $filename = 'qrcode_' . $this->peserta->no_peserta . '_' . time() . '.png';
         $this->qrcodePath = $tempPath . '/' . $filename;
         $result->saveToFile($this->qrcodePath);
@@ -102,17 +102,17 @@ class UndanganAbsen extends Mailable implements ShouldQueue
             ->size(300)
             ->margin(10)
             ->build();
-        
+
         // Save ke temporary file
         $tempPath = storage_path('app/temp');
         if (!file_exists($tempPath)) {
             mkdir($tempPath, 0755, true);
         }
-        
+
         $filename = 'qrcode_' . $this->peserta->no_peserta . '.png';
         $filepath = $tempPath . '/' . $filename;
         $result->saveToFile($filepath);
-        
+
         return [
             \Illuminate\Mail\Mailables\Attachment::fromPath($filepath)
                 ->as('QRCode_' . $this->peserta->no_peserta . '.png')
