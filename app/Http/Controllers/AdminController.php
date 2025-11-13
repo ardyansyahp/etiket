@@ -941,5 +941,73 @@ class AdminController extends Controller
         Absen::truncate();
         return redirect()->route('admin.absen')->with('success', "Berhasil menghapus semua data absen ({$count} record)!");
     }
+
+    public function absenSearchPeserta(Request $request)
+    {
+        $query = $request->get('q', '');
+        
+        if (empty($query)) {
+            return response()->json([]);
+        }
+
+        $peserta = Peserta::where(function($q) use ($query) {
+                $q->where('nama_lengkap', 'like', '%' . $query . '%')
+                  ->orWhere('no_peserta', 'like', '%' . $query . '%')
+                  ->orWhere('email', 'like', '%' . $query . '%')
+                  ->orWhere('no_hp', 'like', '%' . $query . '%');
+            })
+            ->limit(10)
+            ->get()
+            ->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'nama_lengkap' => $item->nama_lengkap,
+                    'no_peserta' => $item->no_peserta,
+                    'email' => $item->email ?? '-',
+                    'no_hp' => $item->no_hp ?? '-',
+                ];
+            });
+
+        return response()->json($peserta);
+    }
+
+    public function absenStoreFromSearch(Request $request)
+    {
+        $request->validate([
+            'id_peserta' => 'required|exists:peserta,id',
+        ]);
+
+        // Cek apakah sudah pernah absen hari ini
+        $today = now()->startOfDay();
+        $todayAbsen = Absen::where('id_peserta', $request->id_peserta)
+            ->whereDate('tanggal_masuk', $today)
+            ->first();
+
+        if ($todayAbsen) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Peserta sudah absen hari ini!'
+            ], 422);
+        }
+
+        // Simpan absen baru
+        $peserta = Peserta::findOrFail($request->id_peserta);
+        $absen = Absen::create([
+            'id_peserta' => $request->id_peserta,
+            'tanggal_masuk' => now(),
+            'nomor_tiket' => $peserta->no_peserta,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Absen berhasil ditambahkan!',
+            'absen' => [
+                'id' => $absen->id,
+                'nama_lengkap' => $peserta->nama_lengkap,
+                'no_peserta' => $peserta->no_peserta,
+                'tanggal_masuk' => $absen->tanggal_masuk->format('d/m/Y H:i:s'),
+            ]
+        ]);
+    }
 }
 
