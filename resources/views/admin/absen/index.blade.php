@@ -67,12 +67,17 @@
                     <div id="searchMessage" style="margin-top: 8px; color: rgba(255,255,255,0.9); font-size: 13px;"></div>
                 </div>
 
-                <form action="{{ route('admin.absen.deleteAll') }}" method="POST" id="deleteAllForm" style="margin-bottom: 20px;">
-                    @csrf
-                    <button type="button" onclick="if(confirm('Yakin ingin menghapus semua data absen?')) { document.getElementById('deleteAllForm').submit(); }" class="btn-purple" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
-                        🗑️ Hapus Semua
-                    </button>
-                </form>
+                <div style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+                    <a href="{{ route('admin.absen.exportExcel') }}" class="btn-purple" style="background: linear-gradient(135deg, #10b981, #059669); text-decoration: none; display: inline-block;">
+                        📊 Export ke Excel
+                    </a>
+                    <form action="{{ route('admin.absen.deleteAll') }}" method="POST" id="deleteAllForm" style="display: inline-block;">
+                        @csrf
+                        <button type="button" onclick="if(confirm('Yakin ingin menghapus semua data absen?')) { document.getElementById('deleteAllForm').submit(); }" class="btn-purple" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                            🗑️ Hapus Semua
+                        </button>
+                    </form>
+                </div>
 
                 <div class="table-wrapper" style="max-height: 600px; overflow-y: auto; border: 1px solid var(--gray-200); border-radius: 8px;">
                     <table class="table">

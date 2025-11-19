@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class AdminController extends Controller
 {
@@ -1008,5 +1013,100 @@ class AdminController extends Controller
                 'tanggal_masuk' => $absen->tanggal_masuk->format('d/m/Y H:i:s'),
             ]
         ]);
+    }
+
+    public function absenExportExcel()
+    {
+        $absen = Absen::with('peserta')->orderBy('tanggal_masuk', 'desc')->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Set judul
+        $sheet->setTitle('Data Absen');
+        
+        // Header
+        $headers = ['ID', 'Nama Peserta', 'No. Peserta', 'Email', 'No. HP', 'Tanggal Masuk', 'Nomor Tiket'];
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+        
+        // Style header
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF'],
+                'size' => 12,
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '8B5CF6'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ];
+        $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+        $sheet->getRowDimension('1')->setRowHeight(25);
+        
+        // Data
+        $row = 2;
+        foreach ($absen as $item) {
+            $sheet->setCellValue('A' . $row, $item->id);
+            $sheet->setCellValue('B' . $row, $item->peserta->nama_lengkap ?? '-');
+            $sheet->setCellValue('C' . $row, $item->peserta->no_peserta ?? '-');
+            $sheet->setCellValue('D' . $row, $item->peserta->email ?? '-');
+            $sheet->setCellValue('E' . $row, $item->peserta->no_hp ?? '-');
+            $sheet->setCellValue('F' . $row, $item->tanggal_masuk ? $item->tanggal_masuk->format('d/m/Y H:i:s') : '-');
+            $sheet->setCellValue('G' . $row, $item->nomor_tiket ?? '-');
+            $row++;
+        }
+        
+        // Style data
+        $dataStyle = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+            'alignment' => [
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+        ];
+        $lastRow = $row - 1;
+        if ($lastRow >= 2) {
+            $sheet->getStyle('A2:G' . $lastRow)->applyFromArray($dataStyle);
+        }
+        
+        // Auto width columns
+        foreach (range('A', 'G') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        
+        // Set alignment untuk kolom tertentu
+        if ($lastRow >= 2) {
+            $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('F2:F' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        }
+        
+        // Generate filename
+        $filename = 'Data_Absen_' . date('Y-m-d_His') . '.xlsx';
+        
+        // Download
+        $writer = new Xlsx($spreadsheet);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        
+        $writer->save('php://output');
+        exit;
     }
 }

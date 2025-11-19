@@ -64,5 +64,6 @@ Route::prefix('admin')->group(function () {
         Route::post('/absen/delete-all', [AdminController::class, 'absenDeleteAll'])->name('admin.absen.deleteAll');
         Route::get('/absen/search-peserta', [AdminController::class, 'absenSearchPeserta'])->name('admin.absen.searchPeserta');
         Route::post('/absen/store-from-search', [AdminController::class, 'absenStoreFromSearch'])->name('admin.absen.storeFromSearch');
+        Route::get('/absen/export-excel', [AdminController::class, 'absenExportExcel'])->name('admin.absen.exportExcel');
     });
 });
